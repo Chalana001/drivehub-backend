@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/drivehub_db
+    username: root
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show_sql: true
+app:
+  jwt:
+    secret: DriveHubSuperSecretKey_ChangeThis_12345678901234567890
+    expiration: 86400000
