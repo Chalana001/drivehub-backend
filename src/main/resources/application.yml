@@ -11,4 +11,5 @@ spring:
 app:
   jwt:
     secret: DriveHubSuperSecretKey_ChangeThis_12345678901234567890
-    expiration: 86400000
+    access-expiration: 900000        # 15 minutes (ms)
+    refresh-expiration: 604800000    # 7 days (ms)

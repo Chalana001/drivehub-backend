@@ -15,16 +15,27 @@ public class JwtService {
     @Value("${app.jwt.secret}")
     private String jwtSecret;
 
-    @Value("${app.jwt.expiration}")
-    private long jwtExpiration;
+    @Value("${app.jwt.access-expiration}")
+    private long accessExpiration;
+
+    @Value("${app.jwt.refresh-expiration}")
+    private long refreshExpiration;
 
     private SecretKey getKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    public String generateToken(String email) {
+    public String generateAccessToken(String email) {
+        return generateToken(email, accessExpiration);
+    }
+
+    public String generateRefreshToken(String email) {
+        return generateToken(email, refreshExpiration);
+    }
+
+    private String generateToken(String email, long expirationMs) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpiration);
+        Date expiryDate = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
                 .subject(email)

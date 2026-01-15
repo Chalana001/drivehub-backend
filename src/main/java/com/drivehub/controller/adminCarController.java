@@ -25,7 +25,7 @@ public class adminCarController {
         return ResponseEntity.ok(carService.addCar(carRequest));
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<CarResponse> updateCar(@PathVariable Long id,@Valid @RequestBody CarRequest carRequest){
         return ResponseEntity.ok(carService.updateCar(id, carRequest));
     }
@@ -37,7 +37,7 @@ public class adminCarController {
     }
 
     @PutMapping ("/{id}/status")
-    public ResponseEntity<CarResponse> updateStatus(@PathVariable Long id, @RequestParam CarStatus carStatus){
+    public ResponseEntity<CarResponse> updateStatus(@PathVariable Long id, @RequestParam("status") CarStatus carStatus){
         return ResponseEntity.ok(carService.updateStatus(id, carStatus));
     }
 

@@ -5,9 +5,12 @@ import com.drivehub.entity.Role;
 import com.drivehub.entity.User;
 import com.drivehub.repository.UserRepository;
 import com.drivehub.security.JwtService;
+import com.drivehub.security.SecurityUtil;
 import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class AuthService {
@@ -42,14 +45,68 @@ public class AuthService {
         return "Registered successfully";
     }
 
-    public AuthResponse login(LoginRequest request) {
+    public AuthTokens login(LoginRequest request) {
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
 
-        String token = jwtService.generateToken(request.getEmail());
-        return new AuthResponse(token, user.getRole().name());
+        String access = jwtService.generateAccessToken(user.getEmail());
+        String refresh = jwtService.generateRefreshToken(user.getEmail());
+        // (or DB stored refresh token system use කරනවා නම්, refreshTokenService.createOrUpdate(user).getToken())
+
+        return new AuthTokens(access, refresh, user.getRole().name());
     }
+
+    public AuthTokens refresh(HttpServletRequest request) {
+
+        String refreshToken = null;
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if ("refresh_token".equals(c.getName())) {
+                    refreshToken = c.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (refreshToken == null) {
+            throw new RuntimeException("No refresh token found");
+        }
+
+        // ✅ validate refresh token (JWT refresh token version)
+        if (!jwtService.isTokenValid(refreshToken)) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+
+        String email = jwtService.extractEmail(refreshToken);
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+        String newAccessToken = jwtService.generateAccessToken(email);
+
+        // refresh token same keep (simple)
+        return new AuthTokens(newAccessToken, refreshToken, user.getRole().name());
+    }
+    public String logout() {
+        // (JWT stateless version - logout just clears cookies in controller)
+        return "Logged out";
+    }
+
+    public MeResponse me() {
+        String email = SecurityUtil.getLoggedInEmail();
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+        return MeResponse.builder()
+                .userId(user.getUserId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .role(user.getRole())
+                .build();
+    }
+
 }
