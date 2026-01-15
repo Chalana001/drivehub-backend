@@ -23,6 +23,7 @@ public class CarController {
         return ResponseEntity.ok(carService.getAllCars());
     }
 
+    @GetMapping("/{id}")
     public ResponseEntity<CarResponse> getCar(@PathVariable Long id){
         return ResponseEntity.ok(carService.getCarById(id));
     }

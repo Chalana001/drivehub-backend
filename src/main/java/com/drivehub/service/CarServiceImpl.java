@@ -25,7 +25,10 @@ public class CarServiceImpl implements CarService{
 
     @Override
     public @Nullable CarResponse getCarById(Long id) {
-        return null;
+        Car car = carRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Car not found"));
+
+        return toResponse(car);
     }
 
     @Override
