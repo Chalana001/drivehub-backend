@@ -1,13 +1,13 @@
 spring:
   datasource:
     url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASS}
+#    username: ${DB_USER}
+#    password: ${DB_PASS}
 
   jpa:
     hibernate:
       ddl-auto: update
-    show_sql: true
+    show_sql: false
 
 server:
   port: ${PORT:8080}
