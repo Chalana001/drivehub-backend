@@ -7,7 +7,8 @@ public class CookieUtil {
     public static ResponseCookie accessCookie(String token) {
         return ResponseCookie.from("access_token", token)
                 .httpOnly(true)
-                .secure(true) // ✅ set true in production HTTPS
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge(15 * 60)
                 .sameSite("Lax")
@@ -18,6 +19,7 @@ public class CookieUtil {
         return ResponseCookie.from("refresh_token", token)
                 .httpOnly(true)
                 .secure(true)
+                .sameSite("None")
                 .path("/auth") // refresh only used on auth routes
                 .maxAge(7 * 24 * 60 * 60)
                 .sameSite("Lax")
@@ -28,6 +30,7 @@ public class CookieUtil {
         return ResponseCookie.from("access_token", "")
                 .httpOnly(true)
                 .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge(0)
                 .build();
@@ -37,6 +40,7 @@ public class CookieUtil {
         return ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
                 .secure(true)
+                .sameSite("None")
                 .path("/auth")
                 .maxAge(0)
                 .build();
