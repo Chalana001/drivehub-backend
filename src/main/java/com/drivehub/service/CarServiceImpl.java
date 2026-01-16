@@ -4,6 +4,7 @@ import com.drivehub.model.dto.CarRequest;
 import com.drivehub.model.dto.CarResponse;
 import com.drivehub.model.entity.Car;
 import com.drivehub.model.entity.CarStatus;
+import com.drivehub.repository.CarRepository;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 

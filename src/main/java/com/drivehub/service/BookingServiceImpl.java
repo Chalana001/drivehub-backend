@@ -5,12 +5,14 @@ import com.drivehub.model.dto.BookingRequest;
 import com.drivehub.model.dto.BookingResponse;
 import com.drivehub.model.entity.Car;
 import com.drivehub.repository.BookingRepository;
+import com.drivehub.repository.CarRepository;
 import com.drivehub.repository.UserRepository;
 import com.drivehub.security.SecurityUtil;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import com.drivehub.entity.Booking;
 import com.drivehub.entity.User;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -48,12 +50,16 @@ public class BookingServiceImpl implements BookingService{
     }
 
     @Override
+    @Transactional
     public @Nullable BookingResponse createBooking(BookingRequest request) {
         if (request.getEndDate().isBefore(request.getStartDate())){
             throw new RuntimeException("End date cannot be before start date");
         }
 
-        Car car = carRepository.findById(request.getCarId()).orElseThrow(() -> new RuntimeException("Car not found"));
+        Car car = carRepository.lockCarById(request.getCarId());
+        if (car == null) {
+            throw new RuntimeException("Car not found");
+        }
 
         List<BookingStatus> activeStatuses = List.of(BookingStatus.PENDING, BookingStatus.APPROVED);
 
